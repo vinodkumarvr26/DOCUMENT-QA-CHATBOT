@@ -2,7 +2,9 @@
 
 DocuChat AI is a Streamlit application for streaming Gemini conversations and
 question answering over user-uploaded PDF and TXT documents. It uses Google's
-official Gen AI SDK directly for chat generation and embeddings.
+official Gen AI SDK directly for chat generation and embeddings. The interface
+uses a responsive dark-navy and electric-blue theme with a welcome dashboard,
+chat workspace, and contextual document panel.
 
 ## Features
 
@@ -18,8 +20,13 @@ official Gen AI SDK directly for chat generation and embeddings.
 
 ## Screenshots
 
-Screenshots are not included yet. Add reviewed application images under
-`assets/screenshots/` and link them in this section when available.
+Real browser captures from the responsive Streamlit application:
+
+- [Home dashboard — desktop](screenshots/home-desktop.png)
+- [Home dashboard — mobile](screenshots/home-mobile.png)
+- [Chat workspace — desktop](screenshots/chat-desktop.png)
+- [Chat workspace — mobile](screenshots/chat-mobile.png)
+- [Documents workspace — desktop](screenshots/documents-desktop.png)
 
 ## Architecture
 
@@ -50,6 +57,7 @@ and index their documents again.
 - `pypdf` for PDF text extraction
 - `python-dotenv` for optional local `.env` configuration
 - pytest for offline automated tests
+- System sans-serif font fallbacks; no external font CDN is used
 
 LangChain is not used by the running application. During the earlier Windows
 environment setup, Windows Application Control blocked a native `xxhash`

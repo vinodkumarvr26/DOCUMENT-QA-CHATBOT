@@ -58,6 +58,7 @@ def test_chat_submission_streams_response_and_uses_follow_up_context(
         ("user", "First question"),
         ("assistant", "A streamed answer."),
     ]
+    assert not app.button(key="clear_conversation").disabled
 
     app.chat_input[0].set_value("Follow-up question").run()
 
@@ -76,6 +77,65 @@ def test_chat_submission_streams_response_and_uses_follow_up_context(
 
     app.button(key="clear_conversation").click().run()
     assert app.session_state["messages"] == []
+
+    conversation_id = app.session_state["conversation_id"]
+    app.button(key="new_chat").click().run()
+    assert app.session_state["messages"] == []
+    assert app.session_state["conversation_id"] != conversation_id
+    assert app.session_state["active_view"] == "chat"
+
+
+def test_home_study_suggestion_submits_a_real_chat_request(monkeypatch) -> None:
+    settings = make_settings("synthetic-test-key")
+    monkeypatch.setattr(config, "load_settings", lambda: settings)
+    monkeypatch.setattr(
+        chat_engine, "create_gemini_client", lambda _settings: MagicMock()
+    )
+    submitted: list[str] = []
+
+    def fake_stream(_client, _settings, _turns, question):
+        submitted.append(question)
+        return iter(["A focused study response."])
+
+    monkeypatch.setattr(stream_handler, "stream_chat_response", fake_stream)
+    app = AppTest.from_file(str(APP_PATH)).run()
+
+    app.button(key="home_suggestion_Study Notes").click().run()
+
+    assert not app.exception
+    assert submitted == [
+        "Help me study. Ask which subject or notes I want to work on."
+    ]
+    assert app.session_state["messages"][-1]["content"] == (
+        "A focused study response."
+    )
+    assert app.session_state["active_view"] == "chat"
+
+
+def test_start_chatting_cta_opens_the_chat_screen(monkeypatch) -> None:
+    monkeypatch.setattr(
+        config, "load_settings", lambda: make_settings("synthetic-test-key")
+    )
+    app = AppTest.from_file(str(APP_PATH)).run()
+
+    app.button(key="start_chatting").click().run()
+
+    assert not app.exception
+    assert app.session_state["active_view"] == "chat"
+    assert app.session_state["messages"] == []
+
+
+def test_document_feature_routes_to_existing_upload_workflow(monkeypatch) -> None:
+    monkeypatch.setattr(
+        config, "load_settings", lambda: make_settings("synthetic-test-key")
+    )
+    app = AppTest.from_file(str(APP_PATH)).run()
+
+    app.button(key="feature_documents").click().run()
+
+    assert not app.exception
+    assert app.session_state["active_view"] == "documents"
+    assert app.file_uploader[0].label == "Upload PDF or TXT documents"
 
 
 def test_document_chat_retrieves_sources_and_displays_citations(
@@ -202,6 +262,9 @@ def test_upload_index_remove_and_clear_controls(monkeypatch) -> None:
         "guide.txt",
         "notes.txt",
     }
+    assert any(
+        "2 indexed · 0 chunks" in markdown.value for markdown in app.markdown
+    )
 
     guide_id = rag_integration.document_id_for_upload(
         "guide.txt", b"Useful guide text"
