@@ -27,6 +27,7 @@ Real browser captures from the responsive Streamlit application:
 - [Chat workspace — desktop](screenshots/chat-desktop.png)
 - [Chat workspace — mobile](screenshots/chat-mobile.png)
 - [Documents workspace — desktop](screenshots/documents-desktop.png)
+- [Documents workspace — mobile](screenshots/documents-mobile.png)
 
 ## Architecture
 

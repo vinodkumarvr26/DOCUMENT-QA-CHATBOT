@@ -118,7 +118,7 @@ def test_start_chatting_cta_opens_the_chat_screen(monkeypatch) -> None:
     )
     app = AppTest.from_file(str(APP_PATH)).run()
 
-    app.button(key="start_chatting").click().run()
+    app.button(key="nav_chat").click().run()
 
     assert not app.exception
     assert app.session_state["active_view"] == "chat"
@@ -131,7 +131,7 @@ def test_document_feature_routes_to_existing_upload_workflow(monkeypatch) -> Non
     )
     app = AppTest.from_file(str(APP_PATH)).run()
 
-    app.button(key="feature_documents").click().run()
+    app.button(key="nav_documents").click().run()
 
     assert not app.exception
     assert app.session_state["active_view"] == "documents"
